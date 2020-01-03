@@ -1,0 +1,104 @@
+﻿@model Ruanal.WebDomain.PageModel<Ruanal.WebDomain.Model.TaskWorkLog>
+@{
+    ViewBag.Title = "任务业务日志";
+    Layout = "~/Views/Shared/_LayoutPageHome.cshtml";
+    string logtype = ((int?)ViewBag.logtype).ToString();
+    List<SelectListItem> items = new List<SelectListItem>() {
+     new SelectListItem(){ Text = "所有", Value = "", Selected = logtype == ""},
+     new SelectListItem(){ Text = "一般日志", Value = "0", Selected = logtype == "0"},
+     new SelectListItem(){ Text = "错误日志", Value = "1", Selected = logtype == "1"}
+    };
+    string[] nottexts = new string[0];
+    if (ViewBag.nottext != null)
+    {
+        nottexts = ViewBag.nottext;
+    }
+    bool iserrormode = ViewBag.IsErrorMode == null ? false : true;
+    if (iserrormode)
+    {
+        ViewBag.Title = "业务日志-错误模式";
+    }
+
+}
+
+<h2>@ViewBag.Title  
+    @if (iserrormode)
+    {
+        <a class="text-info" href="/tasklog/worklog">返回正常模式</a>
+    }
+    else
+    {
+        <a class="text-info" href="/tasklog/worklogerrormode">进入错误模式</a>
+    }
+    </h2>
+<div class="cc-content-header">
+    @if (iserrormode)
+    {
+        <form class="form-inline" role="form">
+            @for (var k = 0; k < 14; k++)
+            {
+                <div class="form-group">
+                    <label for="keywords">排除内容</label>
+                    <input type="text" class="form-control" id="" value="@(nottexts.Skip(k).FirstOrDefault())" name="nottext" placeholder="" />
+                </div>
+            }
+            <br />
+            <div class="form-group">
+                <label for="begintime">创建时间</label>
+                @*<input type="text" class="form-control" id="begintime" value="@ViewBag.begintime" name="begintime" onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd HH:mm:ss' })" />
+                    <input type="text" class="form-control" id="endtime" value="@ViewBag.endtime" name="endtime" onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd HH:mm:ss' })" />*@
+
+                <input type="text" class="form-control" style="width:100px" id="date" placeholder="日期" value="@ViewBag.date" name="date" onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd' })" />
+                :
+                <input type="text" class="form-control" style="width:100px" id="begintime" placeholder="开始时间" value="@ViewBag.begintime" name="begintime" onclick="WdatePicker({ dateFmt: 'HH:mm:ss' })" />
+                -
+                <input type="text" class="form-control" style="width:100px" id="endtime" placeholder="结束时间" value="@ViewBag.endtime" name="endtime" onclick="WdatePicker({ dateFmt: 'HH:mm:ss' })" />
+            </div>
+            <button type="submit" class="btn btn-default">查询</button>
+        </form>
+    }
+    else
+    {
+        <form class="form-inline" role="form">
+            <div class="form-group">
+                <label for="runguid">RunGUID</label>
+                <input type="text" class="form-control" id="runguid" value="@ViewBag.runguid" name="runguid" placeholder="" />
+            </div>
+            <div class="form-group">
+                <label for="keywords">关建字</label>
+                <input type="text" class="form-control" id="keywords" value="@ViewBag.keywords" name="keywords" placeholder="" />
+            </div>
+            <div class="form-group">
+                <label for="nodeid">节点ID</label>
+                <input type="text" class="form-control" id="nodeid" style="width:60px" value="@ViewBag.nodeid" name="nodeid" placeholder="" />
+                <button type="button" class="btn btn-default" onclick="libjs.selectnode('#nodeid')">...</button>
+            </div>
+
+            <div class="form-group">
+                <label for="taskid">任务ID</label>
+                <input type="text" class="form-control" id="taskid" style="width:60px" value="@ViewBag.taskid" name="taskid" placeholder="" />
+                <button type="button" class="btn btn-default" onclick="libjs.selecttask('#taskid')">...</button>
+            </div>
+
+            <div class="form-group">
+                <label for="begintime">创建时间</label>
+                @*<input type="text" class="form-control" id="begintime" value="@ViewBag.begintime" name="begintime" onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd HH:mm:ss' })" />
+                    <input type="text" class="form-control" id="endtime" value="@ViewBag.endtime" name="endtime" onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd HH:mm:ss' })" />*@
+
+                <input type="text" class="form-control" style="width:100px" id="date" placeholder="日期" value="@ViewBag.date" name="date" onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd' })" />
+                :
+                <input type="text" class="form-control" style="width:100px" id="begintime" placeholder="开始时间" value="@ViewBag.begintime" name="begintime" onclick="WdatePicker({ dateFmt: 'HH:mm:ss' })" />
+                -
+                <input type="text" class="form-control" style="width:100px" id="endtime" placeholder="结束时间" value="@ViewBag.endtime" name="endtime" onclick="WdatePicker({ dateFmt: 'HH:mm:ss' })" />
+            </div>
+            <div class="form-group">
+                <label for="taskid">类型</label>
+                @Html.DropDownList("logtype", items, new { @class = "form-control cc-block cc-width-1" })
+            </div>
+            <button type="submit" class="btn btn-default">查询</button>
+        </form>
+    }
+</div>
+@{ Html.RenderPartial("_ListWork", Model);}
+<p class="text-warning">* 运行GUID默认为调度ID，如非调度任务或为主节点任务，运行GUID为"每运行次"时的标识</p>
+

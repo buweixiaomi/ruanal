@@ -1,0 +1,65 @@
+﻿@{
+    ViewBag.Title = "资料";
+    Layout = "~/Views/Shared/_LayoutPageHome.cshtml";
+
+    Ruanal.WebDomain.Model.Manager model = ViewBag.manager;
+    
+}
+@section Head{
+    <script type="text/javascript">
+        ///<reference path="/scripts/jquery-1.9.1.js" />
+        function clickadd(e) {
+            var html = ' <div class="">' +
+                       '<input type="text" class="form-control cc-width-2 cc-display-inline-block" placeholder="小号name" name="nametrumpet">' +
+                       '&nbsp;<input type="button" class="btn btn-primary btn-sm cc-width-0-3 cc-display-inline-block" onclick="deleteclick(this)" value="-" /></div>';
+            $(".addcategory").last().append(html);
+        }
+        function deleteclick(e) {
+            $(e).parent().remove();
+        }
+        function addname() {
+            var catetocate = [];
+            var par = $("input[name='nametrumpet']");
+            for (var i = 0; i < par.length; i++) {
+                catetocate.push($(par[i]).val());
+            }
+            var namelist = catetocate.join(',');
+            $.ajax({
+                url: '/manager/AddManagerOthername',
+                type: 'post',
+                data: { name: catetocate },
+                success: function (data) {
+                    $("#spanmsg").text(data.msg);
+                }
+            });
+        }
+    </script>
+}
+<h2>资料</h2>
+<div class="panel panel-default cc-width-4">
+    <div class="panel-heading">
+        修改密码
+    </div>
+    <div class="panel-body">
+        <form method="post">
+            <p>
+                <label>原密码：</label>
+                <input type="password" class="form-control cc-width-2 cc-display-inline-block" name="oldpwd" />
+            </p>
+            <p>
+                <label>新密码：</label>
+                <input type="password" class="form-control cc-width-2 cc-display-inline-block" name="newpwd" />
+            </p>
+            <p>
+                <label>再一次：</label>
+                <input type="password" class="form-control cc-width-2 cc-display-inline-block" name="newpwd2" />
+            </p>
+            <div>
+                <p class="text-right">
+                    <button class="btn btn-primary">保存</button>
+                    <span class="text-warning">@ViewBag.msg</span>
+                </p>
+            </div>
+        </form>
+    </div>
+</div>

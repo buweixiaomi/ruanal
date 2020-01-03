@@ -1,0 +1,65 @@
+﻿@using Webdiyer.WebControls.Mvc
+@using Ruanal.Web
+@model Ruanal.WebDomain.PageModel<Ruanal.WebDomain.Model.Cmd>
+@{
+}
+
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th width="80px;">ID</th>
+            <th width="180px;">创建时间</th>
+            <th width="80px;">节点ID</th>
+            <th width="80px;">命令类型</th>
+            <th width="150px;">命令参数</th>
+            <th width="80px;">命令状态</th>
+            <th width="180px;">调用时间</th>
+            <th width="180px;">结束时间</th>
+            <th>说明</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var a in Model.List)
+        {
+            <tr>
+                <td>@a.CmdId</td>
+                <td>@Html.ToDateString(a.CreateTime, "datetimefull")</td>
+                <td>@a.NodeId</td>
+                <td>@a.CmdType</td>
+                <td>@a.CmdArgs</td>
+                <td>
+                    @switch (a.CmdState)
+                    {
+                        case 0:
+                            <span class="label label-default">待运行</span>
+                            break;
+                        case 1:
+                        <span class="label label-info">运行中</span>
+                            break;
+                        case 2:
+                        <span class="label label-success">完成</span>
+                            break;
+                        case 3:
+                        <span class="label label-danger">出错</span>
+                            break;
+                        default:
+                        <span class="label label-info">未知</span>
+                            break;
+                    }
+                </td>
+                <td>@Html.ToDateString(a.CallTime, "datetimefull")</td>
+                <td>@Html.ToDateString(a.EndTime, "datetimefull")</td>
+                <td>@a.ResultText</td>
+                <td>
+                    <button class="btn btn-danger" type="button" onclick="deletecmd(this)" data-item="@a.CmdId">删除</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+@Html.Pager(new Webdiyer.WebControls.Mvc.PagedList<object>(Model.List, Model.PageNo, Model.PageSize, Model.TotalCount), new PagerOptions { PageIndexParameterName = "pno", NumericPagerItemCount = 5, ContainerTagName = "ul", CssClass = "pagination pagination-sm", CurrentPagerItemTemplate = "<li class=\"active\"><a href=\"#\">{0}</a></li>", DisabledPagerItemTemplate = "<li class=\"disabled\"><a>{0}</a></li>", PagerItemTemplate = "<li>{0}</li>", Id = "bootstrappager2", PageIndexBoxId = "pageIndexBox", GoToButtonId = "goToBtn" })
+
+
+
+

@@ -1,0 +1,51 @@
+﻿@model Ruanal.WebDomain.PageModel<Ruanal.WebDomain.Model.TaskRunLog>
+@{
+    ViewBag.Title = "任务运行记录";
+    Layout = "~/Views/Shared/_LayoutPageHome.cshtml";
+
+    string resultType = ((int?)ViewBag.resultType).ToString();
+    List<SelectListItem> items = new List<SelectListItem>() {
+     new SelectListItem(){ Text = "所有", Value = "", Selected = resultType == ""},
+     new SelectListItem(){ Text = "执行中", Value = "0", Selected = resultType == "0"},
+     new SelectListItem(){ Text = "完成", Value = "1", Selected = resultType == "1"},
+     new SelectListItem(){ Text = "失败", Value = "2", Selected = resultType == "2"},
+    };
+}
+
+<h2>@ViewBag.Title</h2>
+<div class="cc-content-header">
+    <form class="form-inline" role="form">
+        <div class="form-group">
+            <label for="runguid">RunGUID</label>
+            <input type="text" class="form-control" id="runguid" value="@ViewBag.runguid" name="runguid" placeholder="" />
+        </div>
+        <div class="form-group">
+            <label for="keywords">关建字</label>
+            <input type="text" class="form-control" id="keywords" value="@ViewBag.keywords" name="keywords" placeholder="" />
+        </div>
+        <div class="form-group">
+            <label for="nodeid">节点ID</label>
+            <input type="text" class="form-control" id="nodeid" style="width:60px" value="@ViewBag.nodeid" name="nodeid" placeholder="" />
+            <button type="button" class="btn btn-default" onclick="libjs.selectnode('#nodeid')">...</button>
+        </div>
+
+        <div class="form-group">
+            <label for="taskid">任务ID</label>
+            <input type="text" class="form-control" id="taskid" style="width:60px" value="@ViewBag.taskid" name="taskid" placeholder="" />
+            <button type="button" class="btn btn-default" onclick="libjs.selecttask('#taskid')">...</button>
+        </div>
+        <div class="form-group">
+            <label for="begintime">开始时间</label>
+            <input type="text" class="form-control" id="begintime" value="@ViewBag.begintime" name="begintime" onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd HH:mm:ss' })" />
+            <input type="text" class="form-control" id="endtime" value="@ViewBag.endtime" name="endtime" onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd HH:mm:ss' })" />
+        </div>
+        <div class="form-group">
+            <label for="taskid">运行状态</label>
+            @Html.DropDownList("resultType", items, new { @class = "form-control cc-block cc-width-1" })
+        </div>
+        <button type="submit" class="btn btn-default">查询</button>
+    </form>
+</div>
+@{ Html.RenderPartial("_ListRun", Model);}
+<p class="text-warning">* 运行GUID默认为调度ID，如非调度任务或为主节点任务，运行GUID为"每运行次"时的标识</p>
+

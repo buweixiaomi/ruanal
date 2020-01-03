@@ -1,0 +1,36 @@
+﻿@{
+    ViewBag.Title = "任务管理-首页";
+    Layout = "~/Views/Shared/_LayoutPageNoNav.cshtml";
+    string urlkey = this.UrlKey();
+}
+@using Ruanal.Web
+
+
+@section Head{
+    <style type="text/css">
+        body { min-width: 1000px; }
+    </style>
+    <script type="text/javascript" src="~/Scripts/tabcontainer.js?v=20181225"></script>
+}
+<div class="wrapper-header">
+    <div class="header-head">
+        <a href="/" class="head-logo">任务管理中心</a>
+        @if (User.Identity.IsAuthenticated)
+        {
+            <a class="head-user" href="/account/profile" onclick="return libjs.tabopen(this)" title="个人中心">
+                <span class="glyphicon glyphicon-user"></span>@Ruanal.WebDomain.Utils.CurrUserName()
+            </a>
+            <a class="head-user" href="/account/logout" title="退出"><span class="glyphicon glyphicon-off"></span></a>
+        }
+    </div>
+    <ul class="main-tab"></ul>
+</div>
+<div class="wrapper-main">
+    <div class="wrapper-nav">
+        @Ruanal.Web.MenuBar.GetUserMenu(urlkey, "list-group")
+    </div>
+    <div class="wrapper-content">
+        <ul id="iframe_container"></ul>
+    </div>
+</div>
+

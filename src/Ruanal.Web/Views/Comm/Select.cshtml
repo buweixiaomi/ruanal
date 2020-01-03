@@ -1,0 +1,86 @@
+﻿@{
+    string ty = ViewBag.type;
+}
+
+@if (ty == "manager" || ty == "editoruser")
+{
+    List<Ruanal.WebDomain.Model.Manager> servers = ViewBag.model;
+    if (servers.Count == 0)
+    {
+        <p class="text-muted">无可选内容</p>
+    }
+    <ul class="list-group">
+        @foreach (var a in servers)
+        {
+            <li class="list-group-item" data-item="@a.ManagerId" data-text="@a.Name">@a.ManagerId @a.Name</li>
+        }
+    </ul>
+}
+    @*@if (ty == "financate")
+        {
+            List<Ruanal.Model.FinanceCategory> servers = ViewBag.model;
+            <ul class="list-group">
+                @foreach (var a in servers)
+                {
+                    <li class="list-group-item" data-item="@a.CateId" data-text="@a.Title">@a.CateId @a.Title</li>
+                }
+            </ul>
+        }*@
+
+    @if (ty == "node")
+    {
+        List<Ruanal.WebDomain.Model.Node> diccate = ViewBag.model;
+        if (diccate.Count == 0)
+        {
+            <p class="text-muted">无可选内容</p>
+        }
+        <ul class="list-group">
+            @foreach (var a in diccate)
+            {
+                <li class="list-group-item" data-item="@a.NodeId" data-text="@a.Title">@a.NodeId @a.Title</li>
+            }
+        </ul>
+    }
+    @if (ty == "task")
+    {
+        List<Ruanal.WebDomain.Model.Task> diccate = ViewBag.model;
+        if (diccate.Count == 0)
+        {
+            <p class="text-muted">无可选内容</p>
+        }
+        <ul class="list-group">
+            @foreach (var a in diccate)
+            {
+                <li class="list-group-item" data-item="@a.TaskId" data-text="@a.Title">@a.TaskId @a.Title</li>
+            }
+        </ul>
+    }
+@if (ty == "enterprise")
+{
+    List<Ruanal.WebDomain.Model.MiniEnterprise> diccate = ViewBag.model;
+    if (diccate.Count == 0)
+    {
+        <p class="text-muted">无可选内容</p>
+    }
+    <ul class="list-group">
+        @foreach (var a in diccate)
+        {
+            <li class="list-group-item" data-item="@a.f_qybm" data-text="@a.f_qymc">@a.f_qybm @a.f_qymc</li>
+        }
+    </ul>
+}
+
+@if (ty == "entershop")
+{
+    List<Ruanal.WebDomain.Model.EnterpriseShop> diccate = ViewBag.model;
+    if (diccate.Count == 0)
+    {
+        <p class="text-muted">无可选内容</p>
+    }
+    <ul class="list-group">
+        @foreach (var a in diccate)
+        {
+            <li class="list-group-item" data-item="@a.f_dpid" data-text="@a.f_dpmc">@a.f_dpid @a.f_dpmc</li>
+        }
+    </ul>
+}

@@ -1,0 +1,102 @@
+﻿@model List<Ruanal.WebDomain.Model.Node>
+
+@{
+    ViewBag.Title = "节点管理";
+    Layout = "~/Views/Shared/_LayoutPageHome.cshtml";
+}
+
+<h2>节点管理</h2>
+<div class="well-sm">
+    <a href="/node/edit" class="btn btn-primary">添加节点</a>
+</div>
+@{ Html.RenderPartial("Index_Sub", Model);}
+
+@section scripts
+{
+    <script type="text/javascript">
+        function deletenode(e) {
+            var id = $(e).data('id');
+            if (!confirm("你确定要删除节点吗？"))
+                return;
+            $.ajax({
+                url: '/node/deletenode',
+                type: 'post',
+                data: { nodeid: id },
+                success: function (data) {
+                    if (data.code > 0) {
+                        alert('删除成功');
+                        $(e).parent('tr').first().remove();
+                    } else {
+                        alert(data.msg);
+                    }
+                }
+            });
+        }
+        function restartnode(e) {
+            var id = $(e).data('id');
+            if (!confirm("你确定要重启节点吗？"))
+                return;
+            $.ajax({
+                url: '/node/restartnode',
+                type: 'post',
+                data: { nodeid: id },
+                success: function (data) {
+                    if (data.code > 0) {
+                        alert('命令已发出，请关注命令结果'); 
+                    } else {
+                        alert(data.msg);
+                    }
+                }
+            });
+        }
+        
+
+
+        function setnodedispath(nodeid, state, msg) {
+            if (!confirm("你确定要" + msg + "?"))
+                return;
+            $.ajax({
+                url: '/node/setdispatchstate',
+                type: 'post',
+                data: { nodeid: nodeid, dispatchState: state },
+                success: function (data) {
+                    if (data.code > 0) {
+                        alert('设置成功');
+                        location.reload();
+                    } else {
+                        alert(data.msg);
+                    }
+                }
+            });
+        }
+
+        function viewStatus(e) {
+            var taskid = $(e).data('id');
+            $.ajax({
+                url: '/node/viewstatus',
+                type: 'post',
+                data: { nodeId: taskid },
+                success: function (data) {
+                    if (data.code > 0) {
+                        var html = '';
+                        for (var i = 0; i < data.data.length; i++) {
+                            html += '<div>';
+                            html += '<h4>' + data.data[i].nodeKey + '</h4>';
+                            for (var k = 0; k < data.data[i].instanceStatus.length; k++) {
+                                html += '<p class="text-primary">' + data.data[i].instanceStatus[k] + '</p>';
+                            }
+                            html += '</div>';
+                        }
+
+                        libjs.showdialog('节点任务实例运行情况', html, '确定', function (id) {
+                            libjs.closedialog(id);
+                        })
+                    } else {
+                        alert(data.msg);
+                    }
+                }
+            });
+        }
+    </script>
+}
+

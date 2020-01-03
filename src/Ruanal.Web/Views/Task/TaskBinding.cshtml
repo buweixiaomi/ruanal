@@ -1,0 +1,277 @@
+﻿@using Ruanal.Web
+@model  Tuple<Ruanal.WebDomain.Model.Task, List<Ruanal.WebDomain.Model.TaskBinding>>
+@{
+    Layout = "~/Views/Shared/_LayoutPageHome.cshtml";
+    var model = Model.Item1;
+    var bindings = Model.Item2;
+    ViewBag.Title = "任务绑定 " + " [" + model.TaskId + "]" + model.Title;
+}
+@section Head{
+
+    <style type="text/css">
+        .binding-item { position: relative; }
+        .btn-delete-binding { position: absolute; right: 0; top: 0; }
+    </style>
+    <script type="text/javascript">
+
+        function dia_addbinding() {
+            $("#myModal").modal({});
+            $.ajax({
+                url: '/task/getvalnodes',
+                type: 'post',
+                data: { taskid: $("#TaskId").val() },
+                success: function (data) {
+                    if (data.code > 0) {
+                        $("#vali_node").children().remove();
+                        var templ = '<li class="list-group-item" data-item="{item}">{title}</li>'
+                        for (var k in data.data) {
+                            $("#vali_node").append(templ.replace("{item}", data.data[k].NodeId).replace("{title}", data.data[k].Title));;
+                        }
+                        $("#vali_node li").click(function () {
+                            if ($(this).hasClass('active')) {
+                                $(this).removeClass('active');
+                            } else {
+                                $(this).addClass("active");
+                            }
+                        });
+                    }
+                }
+            });
+        }
+
+        function save_addbinding() {
+            var taskid = $("#TaskId").val();
+            var nodeids = [];
+            $("#vali_node li.active").each(function () {
+                nodeids.push($(this).data('item'));
+            });
+            if (nodeids.length == 0) {
+                alert('请选择节点！');
+                return;
+            }
+            $.ajax({
+                url: '/task/addtaskbinding',
+                data: { taskid: taskid, nodeids: nodeids.join(',') },
+                type: 'post',
+                success: function (data) {
+                    if (data.code > 0) {
+                        alert('添加绑定成功！');
+                        $("#myModal").modal('hide');
+                        location.reload();
+                    }
+                    else {
+                        alert(data.msg);
+                    }
+                },
+                error: function () {
+                    alert("网络或服务器出错！");
+                }
+            });
+        }
+
+        function deletebinding(e) {
+            var bindingid = $(e).data("bindingid");
+            if (confirm("确定要删除吗?")) {
+                $.ajax({
+                    url: '/task/deletetaskbinding',
+                    data: { bindingid: bindingid },
+                    type: 'post',
+                    success: function (data) {
+                        if (data.code > 0) {
+                            alert('删除成功！');
+                            location.reload();
+                        }
+                        else {
+                            alert(data.msg);
+                        }
+                    },
+                    error: function () {
+                        alert("网络或服务器出错！");
+                    }
+                });
+            }
+        }
+
+        function bcmd(e) {
+            var taskid = $(e).data('taskid');
+            var nodeid = $(e).data('nodeid');
+            var cmdtype = $(e).data('cmdtype');
+
+            libjs.cmds.buildcmd(cmdtype, taskid, nodeid, function (data) {
+                if (data.code <= 0) {
+                    alert(data.msg);
+                } else {
+                    alert("命令已发出，请关注执行结果！");
+                }
+            });
+        }
+        function settaskdispath(taskid, nodeid, state, msg) {
+            if (!confirm("你确定要" + msg + "?"))
+                return;
+            $.ajax({
+                url: '/task/setdispatchstate',
+                type: 'post',
+                data: { taskid: taskid, nodeid: nodeid, dispatchState: state },
+                success: function (data) {
+                    if (data.code > 0) {
+                        alert('设置成功');
+                        location.reload();
+                    } else {
+                        alert(data.msg);
+                    }
+                }
+            });
+        }
+    </script>
+}
+
+@{ Html.RenderPartial("_TaskTabControl");}
+
+<div class="well well-sm cc-width-6">
+    <div>
+        <input type="hidden" id="TaskId" value="@(model.TaskId)" />
+        <label>任务名称：</label> @(model.Title)
+    </div>
+    <div>
+        <label>当前版本序号：</label> @(model.CurrVersionId)
+    </div>
+    <div>
+        <label>统一命令：</label>
+        <div class="btn-group cc-block">
+            <button class="btn btn-primary" type="button" onclick="bcmd(this)" data-cmdtype="starttask" data-taskid="@(model.TaskId)">开始</button>
+            <button class="btn btn-danger" type="button" onclick="bcmd(this)" data-cmdtype="stoptask" data-taskid="@(model.TaskId)">停止</button>
+            <button class="btn btn-danger" type="button" onclick="bcmd(this)" data-cmdtype="uninstalltask" data-taskid="@(model.TaskId)">卸载</button>
+        </div>
+        <span>&nbsp;&nbsp;&nbsp;</span>
+        <div class="btn-group btn-group-sm taskbtns">
+            <button class="btn btn-danger btn-sm" type="button" onclick="settaskdispath(@(model.TaskId),0,'1', '停止分配')">停止分配</button>
+            <button class="btn btn-primary btn-sm" type="button" onclick="settaskdispath(@(model.TaskId),0,'0', '启动分配')">启动分配</button>
+        </div>
+    </div>
+
+    <p>
+        <button type="button" class="btn btn-primary" onclick="dia_addbinding()">添加绑定</button>
+    </p>
+</div>
+
+<div class="cc-container">
+    <p>以下是任务的节点绑定信息：</p>
+</div>
+<div class="cc-container">
+    @foreach (var a in bindings)
+    {
+        <div class="well cc-block cc-width-4 binding-item">
+            <div class="">
+                <label>节点名称:</label>
+                @Html.Raw(a.Node.NodeType == 1 ? "<span style=\"color:red;\">【主】</span>" : "")
+                [@(a.NodeId)] 
+                @(a.Node.Title) 
+            </div>
+            <div class="">
+                <label>运行版本:</label>@a.RunVersion
+            </div>
+            <div class="">
+                <label>节点上次心跳时间:</label>@Html.ToDateString(a.Node.LastHeartTime)
+                @if (!Ruanal.WebDomain.BLL.TaskBll.HeartIsOk(a.Node.LastHeartTime))
+                {
+                    <span style="color:red;"><span class="glyphicon glyphicon-alert"></span>心跳异常</span>
+                }
+            </div>
+            <div class="">
+                <label>上次运行时间:</label>@Html.ToDateString(a.LastRunTime)
+            </div>
+            <div>
+                <label>本地状态:</label>
+                @if (a.LocalState == 0)
+                {
+                    <span class="label label-danger">停止</span>
+                }
+                else if (a.LocalState == 1)
+                {
+                    <span class="label label-success">运行中</span>
+                }
+                else
+                {
+                    <span class="label label-default">未知</span>
+                }
+                <label>运行状态:</label>
+                @if (a.ServerState == 0)
+                {
+                    <span class="label label-danger">停止</span>
+                }
+                else if (a.ServerState == 1)
+                {
+                    <span class="label label-success">运行中</span>
+                }
+                else
+                {
+                    <span class="label label-default">未知</span>
+                }
+                @if (a.ServerState != a.LocalState)
+                {
+                    <span class="glyphicon glyphicon-alert" style="color:red;">状态异常</span>
+                }
+                <label>分配状态:</label>
+                @if (a.StopDispatch == 0)
+                {
+                    <span class="label label-success">分配中</span>
+                }
+                else
+                {
+                    <span class="label label-danger">停止</span>
+                }
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-primary" type="button" onclick="bcmd(this)" data-cmdtype="starttask" data-taskid="@(model.TaskId)" data-nodeid="@a.NodeId">开始</button>
+                <button class="btn btn-danger" type="button" onclick="bcmd(this)" data-cmdtype="stoptask" data-taskid="@(model.TaskId)" data-nodeid="@a.NodeId">停止</button>
+                <button class="btn btn-danger" type="button" onclick="bcmd(this)" data-cmdtype="uninstalltask" data-taskid="@(model.TaskId)" data-nodeid="@a.NodeId">卸载</button>
+            </div>
+
+            <div class="btn-group btn-group-sm">
+                @if (a.StopDispatch == 0)
+                {
+                    <button class="btn btn-danger btn-sm" type="button" onclick="settaskdispath(@a.TaskId,@a.NodeId,'1', '停止分配')">停止分配</button>
+                }
+                else
+                {
+                    <button class="btn btn-primary btn-sm" type="button" onclick="settaskdispath(@a.TaskId,@a.NodeId,'0', '启动分配')">启动分配</button>
+                }
+            </div>
+
+            <button class="btn btn-danger btn-delete-binding" type="button" onclick="deletebinding(this)" data-bindingid="@a.BindId">
+                <span class="glyphicon glyphicon-remove"></span>
+            </button>
+
+        </div>
+    }
+</div>
+
+<!-- 模态框（Modal） -->
+<div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    &times;
+                </button>
+                <h4 class="modal-title" id="myModalLabel">添加任务节点绑定</h4>
+            </div>
+            <div class="modal-body">
+                <p>请选择要绑定的节点</p>
+                <ul class="list-group" id="vali_node">
+                    <li class="list-group-item">免费域名注册</li>
+                    <li class="list-group-item">免费 Window 空间托管</li>
+                    <li class="list-group-item">图像的数量</li>
+                    <li class="list-group-item">24*7 支持</li>
+                    <li class="list-group-item">每年更新成本</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">
+                    关闭
+                </button>
+                <button type="button" class="btn btn-primary" onclick="save_addbinding()">确定</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>

@@ -1,0 +1,136 @@
+﻿@using Ruanal.Web
+@model  Tuple<Ruanal.WebDomain.Model.Task, List<Ruanal.WebDomain.Model.TaskVersion>>
+@{
+    Layout = "~/Views/Shared/_LayoutPageHome.cshtml";
+    var model = Model.Item1;
+    var versions = Model.Item2;
+    ViewBag.Title = "任务版本 " + " [" + model.TaskId + "]" + model.Title;
+}
+@section Head{
+    <script type="text/javascript">
+        function setversionid(e) {
+            var taskid = $(e).data("item");
+            var versionid = $(e).data("vesid");
+            $.ajax({
+                url: '/task/SetTaskVersionid',
+                data: { taskid: taskid, versionid: versionid },
+                type: 'post',
+                success: function (data) {
+                    if (data.code > 0) {
+                        location.reload();
+                    }
+                    else {
+                        alert(data.msg);
+                    }
+                },
+                error: function () {
+                    alert("网络或服务器出错！");
+                }
+            });
+        }
+
+        function deletetaskversion(e) {
+            if (confirm("确定要删除吗?")) {
+                var versionid = $(e).data("item");
+                $.ajax({
+                    url: '/task/deletetaskversion',
+                    data: { versionid: versionid },
+                    type: 'post',
+                    success: function (data) {
+                        if (data.code > 0) {
+                            location.reload();
+                        }
+                        else {
+                            alert(data.msg);
+                        }
+                    },
+                    error: function () {
+                        alert("网络或服务器出错！");
+                    }
+                });
+            }
+        }
+    </script>
+}
+
+@{ Html.RenderPartial("_TaskTabControl");}
+
+<div style="width:1000px; padding:20px;">
+    <div>
+        <p class="text-info">* 最多显示最近10个版本</p>
+        <table class="table table-bordered" style="">
+            <thead>
+                <tr>
+                    <th width="125px">版本号</th>
+                    <th width="35px">序号</th>
+                    <th width="135px">创建时间</th>
+                    <th width="230px">下载地址</th>
+                    <th width="75px">大小(kb)</th>
+                    <th width="180px">备注</th>
+                    <td width="160px">操作</td>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var a in versions)
+                {
+                    <tr>
+                        <td>@a.VersionNO</td>
+                        <td>@a.VersionId</td>
+                        <td>@Html.ToDateString(a.CreateTime)</td>
+                        <td>@a.FilePath</td>
+                        <td>@a.FileSize</td>
+                        <td>@a.Remark</td>
+                        <td>
+                            @if (model.CurrVersionId == a.VersionId)
+                            {
+                                <button class="btn btn-primary" data-item="@a.TaskId" data-vesid="@a.VersionId" onclick="setversionid(this)">已为当前版本</button>
+                            }
+                            else
+                            {
+                                <button class="btn btn-default" data-item="@a.TaskId" data-vesid="@a.VersionId" onclick="setversionid(this)">设为当前版本</button>
+                            }
+                            <button class="btn btn-danger" data-item="@a.VersionId" onclick="deletetaskversion(this)">删除</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div>
+        <div class="well" style="width:800px;padding:8px;">
+            <h3 style="margin:10px;">新增版本</h3>
+            <form class="form-horizontal" role="form" method="post" enctype="multipart/form-data">
+
+                <div class="form-group">
+                    <label for="downloadfile" class="col-sm-2 control-label"><span style="color:red;">*</span>zip压缩文件</label>
+                    <div class="col-sm-10">
+                        <input type="file" id="downloadfile" name="downloadfile" placeholder="" value="">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="VersionNo" class="col-sm-2 control-label">版本号</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control cc-width-4" id="VersionNo" name="VersionNo" placeholder="版本号，可空自动生成" value="">
+                        <input type="hidden" name="TaskId" value="@(model.TaskId)" />
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <label for="Remark" class="col-sm-2 control-label">备注</label>
+                    <div class="col-sm-10">
+                        <textarea class="form-control cc-width-4" id="Remark" name="Remark" placeholder="" rows="2"></textarea>
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <button type="submit" class="btn btn-primary">保存</button>
+                        <span class="label label-info">@ViewBag.msg</span>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,54 @@
+﻿@using Webdiyer.WebControls.Mvc
+@using Ruanal.Web
+@model Ruanal.WebDomain.PageModel<Ruanal.WebDomain.Model.TaskWorkLog>
+@{
+}
+
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th width="100px;">ID</th>
+            <th width="100px;">任务ID</th>
+            <th width="100px;">节点ID</th>
+            <th width="100px;">运行GUID</th> 
+            <th width="180px;">创建时间</th>
+            <th width="80px;">日志类型</th>
+            <th>说明</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var a in Model.List)
+        {
+            <tr>
+                <td>@a.LogId</td>
+                <td>@a.TaskId</td>
+                <td>@a.NodeId</td>
+                <td>@a.DispatchId</td>
+                <td>@Html.ToDateString(a.ServerTime, "datetimefull")</td>  
+                <td>
+                    @switch (a.LogType)
+                    {
+                        case 0:
+                            <span class="label label-info">一般</span>
+                            break;
+                        case 1:
+                            <span class="label label-danger">错误</span>
+                            break;
+                        default:
+                            <span class="label label-info">未知</span>
+                            break;
+                    }
+                </td>
+                <td>@a.LogText</td> 
+            </tr>
+        }
+    </tbody>
+</table>
+@Html.Pager(new Webdiyer.WebControls.Mvc.PagedList<object>(Model.List, Model.PageNo, Model.PageSize, Model.TotalCount), new PagerOptions { PageIndexParameterName = "pno", NumericPagerItemCount = 5, ContainerTagName = "ul", CssClass = "pagination pagination-sm", CurrentPagerItemTemplate = "<li class=\"active\"><a href=\"#\">{0}</a></li>", DisabledPagerItemTemplate = "<li class=\"disabled\"><a>{0}</a></li>", PagerItemTemplate = "<li>{0}</li>", Id = "bootstrappager2", PageIndexBoxId = "pageIndexBox", GoToButtonId = "goToBtn" })
+<p class="text-info"> 当前 @(Model.PageNo)页/@(
+ Math.Ceiling(Model.TotalCount / (decimal)Math.Max(1, Model.PageSize)).ToString("0")
+)页 总数 @Model.TotalCount</p>
+
+
+
+

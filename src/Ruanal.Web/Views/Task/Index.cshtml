@@ -1,0 +1,177 @@
+﻿@model List<Ruanal.WebDomain.Model.Task>
+
+@{
+    ViewBag.Title = "任务列表";
+    Layout = "~/Views/Shared/_LayoutPageHome.cshtml";
+    Dictionary<int, string> tags = ViewBag.tags;
+    int currentTag = ViewBag.currtag;
+}
+
+<div>
+    <span>任务列表</span>
+    <a href="/task/edit" class="btn btn-primary btn-sm">添加任务</a>
+    <a href="/task/batchversion" class="btn btn-info btn-sm" onclick="return libjs.tabopen(this)">批量版本</a>
+    <input type="hidden" id="currtag_hd" value="@currentTag" />
+    <div class="btn btn-group btn-group-sm">
+        @Html.ActionLink("[所有]", "index", "task", new { tag = "-1" }, new { @class = "btn btn-default " + (-1 == currentTag ? "active" : "") })
+        @foreach (var a in tags)
+        {
+            if (string.IsNullOrEmpty(a.Value)) { continue; }
+            @Html.ActionLink(a.Value, "index", "task", new { tag = a.Key }, new { @class = "btn btn-default " + (a.Key == currentTag ? "active" : "") })
+        }
+    </div>
+    <button type="button" id="btnhidebtn" class="btn btn-primary btn-sm">隐藏按钮</button>
+    <div class="btn-group cc-block taskbtns">
+        <button class="btn btn-primary" type="button" onclick="bcmdall(this)" data-cmdtype="starttask" data-taskid="">开始ALL</button>
+        <button class="btn btn-danger" type="button" onclick="bcmdall(this)" data-cmdtype="stoptask" data-taskid="">停止ALL</button>
+        <button class="btn btn-danger" type="button" onclick="bcmdall(this)" data-cmdtype="deletetask" data-taskid="">卸载ALL</button>
+    </div>
+</div>
+
+@{ Html.RenderPartial("Index_Sub", Model);}
+
+@section scripts
+{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#btnhidebtn").click(function () {
+                var s = setshowbtn(-1);
+                setshowbtn(s ? '' : 'yes');
+                cookieshowbtn();
+            });
+            cookieshowbtn();
+        });
+        function cookieshowbtn() {
+            var v = setshowbtn(-1);
+            if (v) {
+                $(".taskbtns").show();
+                $("#btnhidebtn").text("隐藏按钮");
+            }
+            else {
+                $(".taskbtns").hide();
+                $("#btnhidebtn").text("显示按钮");
+            }
+        }
+        function setshowbtn(v) {
+            var name = "_taskbtnshow";
+            if (v === -1) {
+                var cookie = getCookie(name);
+                return cookie;
+            } else {
+                if (v) {
+                    v = 'yes';
+                } else {
+                    v = '';
+                }
+                setCookie(name, v);
+            }
+        }
+
+        function deletetask(e) {
+            var id = $(e).data('id');
+            if (!confirm("你确定要删除该任务吗？"))
+                return;
+            $.ajax({
+                url: '/task/deletetask',
+                type: 'post',
+                data: { taskid: id },
+                success: function (data) {
+                    if (data.code > 0) {
+                        alert('删除成功');
+                        $(e).parent('tr').first().remove();
+                    } else {
+                        alert(data.msg);
+                    }
+                }
+            });
+        }
+
+        function bcmd(e) {
+            var taskid = $(e).data('taskid');
+            var nodeid = $(e).data('nodeid');
+            var cmdtype = $(e).data('cmdtype');
+            if (!confirm('你确定要进行该操作吗？'))
+                return;
+            libjs.cmds.buildcmd(cmdtype, taskid, nodeid, function (data) {
+                if (data.code <= 0) {
+                    alert(data.msg);
+                } else {
+                    alert("命令已发出，请关注执行结果！");
+                }
+            });
+        }
+        function bcmdall(e) {
+            var crtag = parseInt($("#currtag_hd").val());
+            if (crtag <= 0) {
+                alert('当前标签不能进行该操作！');
+                return;
+            }
+            if (!confirm('你确定要进行该批量操作吗？'))
+                return; 
+            var cmdtype = $(e).data('cmdtype');
+            var taskids = [];
+            $(".list-task-item").each(function () {
+                taskids.push($(this).val());
+            });
+            for (var k = 0; k < taskids.length; k++) {
+                libjs.cmds.buildcmd(cmdtype, taskids[k], "", function (data) {
+                });
+            }
+            alert("命令已发出，请关注执行结果！");
+        }
+
+
+        function showorhidesubbindings(e) {
+            var taskid = $(e).data('tid');
+            $(".subbindings-t-" + taskid).toggle();
+
+        }
+        function settaskdispath(taskid, nodeid, state, msg) {
+            if (!confirm("你确定要" + msg + "?"))
+                return;
+            $.ajax({
+                url: '/task/setdispatchstate',
+                type: 'post',
+                data: { taskid: taskid, nodeid: nodeid, dispatchState: state },
+                success: function (data) {
+                    if (data.code > 0) {
+                        alert('设置成功');
+                        location.reload();
+                    } else {
+                        alert(data.msg);
+                    }
+                }
+            });
+        }
+
+        function viewStatus(e) {
+            var taskid = $(e).data('id');
+            $.ajax({
+                url: '/task/viewstatus',
+                type: 'post',
+                data: { taskid: taskid },
+                success: function (data) {
+                    if (data.code > 0) {
+                        var html = '';
+                        for (var i = 0; i < data.data.length; i++) {
+                            html += '<div>';
+                            html += '<h4>' + data.data[i].nodeKey + '</h4>';
+                            for (var k = 0; k < data.data[i].instanceStatus.length; k++) {
+                                html += '<p class="text-primary">' + data.data[i].instanceStatus[k] + '</p>';
+                            }
+                            html += '</div>';
+                        }
+
+                        libjs.showdialog('任务运行节点实例运行情况', html, '确定', function (id) {
+                            libjs.closedialog(id);
+                        })
+                    } else {
+                        alert(data.msg);
+                    }
+                }
+            });
+        }
+    </script>
+
+}
+

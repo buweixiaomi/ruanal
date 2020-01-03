@@ -1,0 +1,19 @@
+﻿@{
+    int taskId = ViewBag.taskId;
+    string currtab = ViewBag.currTab;
+}
+
+<h2>
+    @ViewBag.Title
+    <a href="/task/index" class="btn btn-default">返回</a>
+</h2>
+@if (taskId > 0)
+{
+    <div class="btn-group" style="margin:10px 30px;">
+        @Html.ActionLink("编辑", "edit", new { taskid = taskId }, new { @class = "btn btn-default " + (currtab == "edit" ? "active" : "") })
+        @Html.ActionLink("绑定", "taskbinding", new { taskid = taskId }, new { @class = "btn btn-default " + (currtab == "binding" ? "active" : "") })
+        @Html.ActionLink("版本", "taskversion", new { taskid = taskId }, new { @class = "btn btn-default " + (currtab == "version" ? "active" : "") })
+    </div>
+}
+
+

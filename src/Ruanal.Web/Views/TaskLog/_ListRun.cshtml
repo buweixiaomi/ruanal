@@ -1,0 +1,85 @@
+﻿@using Webdiyer.WebControls.Mvc
+@using Ruanal.Web
+@model Ruanal.WebDomain.PageModel<Ruanal.WebDomain.Model.TaskRunLog>
+@{
+}
+
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th width="80px;">ID</th>
+            <th width="80px;">任务ID</th>
+            <th width="80px;">节点ID</th>
+            <th width="180px;">运行GUID</th>
+            <th width="80px;">运行类型</th>
+            <th width="80px;">运行状态</th>
+            <th width="180px;">运行开始时间</th>
+            <th width="180px;">运行完成时间</th>
+            <th width="80px;">用时(分钟)</th>
+            <th width="180px;">说明</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var a in Model.List)
+        {
+            <tr>
+                <td>
+                    @Html.ActionLink(a.LogId.ToString(), "worklog", new { runguid = a.RunGuid }, null)
+                </td>
+                <td>@a.TaskId</td>
+                <td>@a.NodeId</td>
+                <td>@a.RunGuid</td>
+                <td>
+                    @switch (a.RunType)
+                    {
+                        case 0:
+                            <span class="label label-info">计划</span>
+                            break;
+                        case 1:
+                        <span class="label label-info">调度</span>
+                            break;
+                        case 2:
+                        <span class="label label-info">分配项</span>
+                            break;
+                        default:
+                        <span class="label label-info">未知</span>
+                            break;
+                    }
+                </td>
+                <td>
+                    @switch (a.ResultType)
+                    {
+                        case 0:
+                            <span class="label label-info">执行中</span>
+                            break;
+                        case 1:
+                        <span class="label label-success">完成</span>
+                            break;
+                        case 2:
+                        <span class="label label-danger">失败</span>
+                            break;
+                        default:
+                        <span class="label label-info">未知</span>
+                            break;
+                    }
+                </td>
+
+                <td>@Html.ToDateString(a.RunServerTime, "datetimefull")</td>
+
+                <td>@Html.ToDateString(a.EndServerTime, "datetimefull")</td>
+                <td>
+                    @if (a.RunDbTime != null && a.EndDbTime != null)
+                    {
+                        <span>@((a.EndDbTime.Value - a.RunDbTime).TotalMinutes.ToString("0.00"))</span>
+                    }
+                </td>
+                <td>@a.LogText</td>
+            </tr>
+        }
+    </tbody>
+</table>
+@Html.Pager(new Webdiyer.WebControls.Mvc.PagedList<object>(Model.List, Model.PageNo, Model.PageSize, Model.TotalCount), new PagerOptions { PageIndexParameterName = "pno", NumericPagerItemCount = 5, ContainerTagName = "ul", CssClass = "pagination pagination-sm", CurrentPagerItemTemplate = "<li class=\"active\"><a href=\"#\">{0}</a></li>", DisabledPagerItemTemplate = "<li class=\"disabled\"><a>{0}</a></li>", PagerItemTemplate = "<li>{0}</li>", Id = "bootstrappager2", PageIndexBoxId = "pageIndexBox", GoToButtonId = "goToBtn" })
+
+
+
+

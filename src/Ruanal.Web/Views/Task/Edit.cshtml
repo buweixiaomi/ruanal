@@ -1,0 +1,197 @@
+﻿@model Ruanal.WebDomain.Model.Task
+@using Ruanal.Web;
+@{
+    ViewBag.Title = Model == null ? "添加任务" : ("编辑任务 " + "[" + Model.TaskId + "]" + Model.Title);
+    Layout = "~/Views/Shared/_LayoutPageHome.cshtml";
+    var model = Model != null ? Model : new Ruanal.WebDomain.Model.Task();
+
+    Dictionary<int, string> tags = ViewBag.tags;
+}
+
+@section Head{
+    <script src="~/Scripts/configEditor.js?v=2"></script>
+    <script type="text/javascript">
+        function changeType(totype) {
+            $("#TaskType").val(totype);
+            $(".templates-btn").removeClass("active");
+            $("#btnct" + totype).addClass("active");
+            if (totype == '1')
+                $(".tasktype1").show();
+            else
+                $(".tasktype1").hide();
+        }
+
+        function showcd() {
+            if ($("#TaskId").val()) {
+                $.post('/task/GetTaskConfigSet', { taskId: $("#TaskId").val() }, function (data) {
+                    if (data.code <= 0) {
+                        alert(data.msg);
+                        return;
+                    }
+                    var json = $("#TaskConfig").val(); 
+                    showConfigDialog(json, 'task', function (v) {
+                        $("#TaskConfig").val(v);
+                    }, data.data);
+                })
+                return;
+            }
+
+            showConfigDialog($("#TaskConfig").val(), 'task', function (v) {
+                $("#TaskConfig").val(v);
+            })
+        }
+        $(document).ready(function () {
+            changeType($("#TaskType").val());
+        });
+
+    </script>
+}
+
+@{ Html.RenderPartial("_TaskTabControl");}
+<div>
+    <form class="form-horizontal" role="form" method="post" id="edit-form">
+        <div class="form-group">
+            <label for="QuotesId" class="col-sm-2 control-label">任务序号</label>
+            <div class="col-sm-10">
+                @if (model.TaskId <= 0)
+                {
+                    <input type="text" class="form-control cc-width-6-5" name="TaskId" id="TaskId" placeholder="自动生成" readonly="readonly" value=""> }
+                else
+                {
+                    <input type="text" class="form-control cc-width-6-5" name="TaskId" id="TaskId" readonly="readonly" value="@(model.TaskId)">
+                }
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="Title" class="col-sm-2 control-label">标题</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control cc-width-6-5 cc-display-inline-block" name="Title" id="Title" value="@(model.Title)">
+                <span class="text-danger">*</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="TitleTemplate" class="col-sm-2 control-label">可用状态</label>
+            <div class="col-sm-10">
+                <select class="form-control cc-block cc-width-2" disabled>
+                    @switch (model.State)
+                    {
+                        case 0:
+                            <option>可用</option>
+                            break;
+                        default:
+                            <option>不可用</option>
+                            break;
+                    }
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="EnterDll" class="col-sm-2 control-label">标签</label>
+            <div class="col-sm-10">
+                @foreach (var a in tags)
+                {
+                    if (string.IsNullOrEmpty(a.Value))
+                    {
+                        continue;
+                    }
+
+                    <span style="margin-right:5px;">
+                        <input type="checkbox" id="tag_@a.Key" value="@a.Key" @((model.TaskTags & (1 << (a.Key - 1))) != 0 ? "checked" : "") name="tasktag" />
+                        <label for="tag_@a.Key">@a.Value</label>
+                    </span>
+
+                }
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="EnterDll" class="col-sm-2 control-label">入口DLL</label>
+            <div class="col-sm-10">
+                <input class="form-control cc-width-6-5 cc-display-inline-block" rows="6" id="EnterDll" name="EnterDll" value="@(model.EnterDll)" />
+                <span class="text-danger">*</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="EnterClass" class="col-sm-2 control-label">入口类名</label>
+            <div class="col-sm-10">
+                <input class="form-control cc-width-6-5 cc-display-inline-block" rows="6" id="EnterClass" name="EnterClass" value="@(model.EnterClass)" />
+                <span class="text-danger">*</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="RunCron" class="col-sm-2 control-label">运行Cron</label>
+            <div class="col-sm-10">
+                <input class="form-control cc-width-6-5 cc-display-inline-block" placeholder="cron表达式，服务任务请用 'runonce'。" rows="6" id="RunCron" name="RunCron" value="@(model.RunCron)" />
+                <span class="text-danger">*</span>
+                <a class="text-info" href="~/CronLocal/index.html" onclick="return libjs.tabopen(this)" target="_blank">cron编辑器</a>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">任务类型</label>
+            <div class="col-sm-10">
+                <div class="btn-group btn-group-sm cc-display-inline-block">
+                    <button type="button" class="btn btn-default btn-sm templates-btn templates-btn0 active " data-type="0" id="btnct0" onclick="changeType('0')">普通任务</button>
+                    <button type="button" class="btn btn-default btn-sm templates-btn  templates-btn1 active " data-type="1" id="btnct1" onclick="changeType('1')">调度任务</button>
+                </div>
+                <input type="hidden" name="TaskType" id="TaskType" value="@(model.TaskType)" />
+            </div>
+        </div>
+
+        <div class="form-group tasktype1">
+            <label for="ExpireMins" class="col-sm-2 control-label">调度过期时间(分钟)</label>
+            <div class="col-sm-10">
+                <input class="form-control cc-width-3-5 cc-display-inline-block" rows="6" id="ExpireMins" name="ExpireMins" value="@(model.ExpireMins)" />
+                <span class="text-danger">* 默认@(Ruanal.Core.ConfigConst.DispatchDefaultExpireMins)分钟</span>
+            </div>
+        </div>
+        <div class="form-group tasktype1">
+            <label for="DispatchClass" class="col-sm-2 control-label">调度类名</label>
+            <div class="col-sm-10">
+                <input class="form-control cc-width-3-5 cc-display-inline-block" id="DispatchClass" name="DispatchClass" value="@(model.DispatchClass)" />
+                <span class="text-danger">*</span>
+                <button class="btn btn-primary" type="button" onclick="$('#DispatchClass').val('InnerEnterDis')">企业调度器</button>
+                @*<button class="btn btn-primary" type="button" onclick="$('#DispatchClass').val('InnerEnterShopDis')">店铺调度器</button>*@
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="NodeConfig" class="col-sm-2 control-label">任务配置</label>
+            <div class="col-sm-10">
+                <p><button type="button" class="btn btn-primary" onclick="showcd()">配置编辑器</button></p>
+                <textarea class="form-control cc-width-6-5" rows="7" id="TaskConfig" name="TaskConfig">@(model.TaskConfig)</textarea>
+            </div>
+        </div>
+        @if (model.TaskId > 0)
+        {
+            <div class="form-group">
+                <label for="CnDesc" class="col-sm-2 control-label">创建时间</label>
+                <div class="col-sm-10">
+                    <input class="form-control cc-width-6-5 cc-display-inline-block" rows="6" id="CreateTime" name="" value="@Html.ToDateString(model.CreateTime)" disabled />
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="CnDesc" class="col-sm-2 control-label">更新时间</label>
+                <div class="col-sm-10">
+                    <input class="form-control cc-width-6-5 cc-display-inline-block" rows="6" id="UpdateTime" name="" value="@Html.ToDateString(model.UpdateTime)" disabled />
+                </div>
+            </div>
+        }
+        <div class="form-group">
+            <label for="Remark" class="col-sm-2 control-label">备注</label>
+            <div class="col-sm-10">
+                <textarea class="form-control cc-width-6-5" rows="2" id="Remark" name="Remark">@(model.Remark)</textarea>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                @if (model.TaskId <= 0)
+                {
+                    <button type="submit" class="btn btn-primary" onclick="">新增</button>}
+                else
+                {
+                    <button type="submit" class="btn btn-primary" onclick="">保存</button>
+                }
+                <span class="label label-info">@ViewBag.msg</span>
+            </div>
+        </div>
+    </form>
+</div>

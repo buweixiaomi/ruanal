@@ -1,0 +1,64 @@
+﻿@model Ruanal.WebDomain.PageModel<Ruanal.WebDomain.Model.Cmd>
+@{
+    ViewBag.Title = "命令列表";
+    Layout = "~/Views/Shared/_LayoutPageHome.cshtml";
+    string cmdState = ((int?)ViewBag.cmdState).ToString();
+    List<SelectListItem> items = new List<SelectListItem>() {
+new SelectListItem(){ Text = "所有", Value = "", Selected = cmdState == ""},
+new SelectListItem(){ Text = "待运行", Value = "0", Selected = cmdState == "0"},
+new SelectListItem(){ Text = "运行中", Value = "1", Selected = cmdState == "1"},
+new SelectListItem(){ Text = "完成", Value = "2", Selected = cmdState == "2"},
+new SelectListItem(){ Text = "出错", Value = "3", Selected = cmdState == "3"}
+};
+}
+
+<h2>@ViewBag.Title</h2>
+<div class="cc-content-header">
+    <form class="form-inline" role="form">
+        <div class="form-group">
+            <label for="nodeid">节点ID</label>
+            <input type="text" class="form-control" id="nodeid" value="@ViewBag.nodeid" name="nodeid" placeholder="" />
+            <button type="button" class="btn btn-default" onclick=" libjs.selectnode('#nodeid')">...</button>
+        </div>
+        <div class="form-group">
+            <label for="cmdState">命令状态</label>
+            @Html.DropDownList("cmdState", items, new { @class = "form-control cc-block cc-width-1" })
+        </div>
+        <div class="form-group">
+            <label for="begintime">命令时间</label>
+            <input type="text" class="form-control" id="begintime" value="@ViewBag.begintime" name="begintime" onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd HH:mm:ss' })" />
+            <input type="text" class="form-control" id="endtime" value="@ViewBag.endtime" name="endtime" onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd HH:mm:ss' })" />
+        </div>
+        <button type="submit" class="btn btn-default">查询</button>
+    </form>
+</div>
+@{ Html.RenderPartial("_List", Model);}
+
+@section Head
+{
+    <script type="text/javascript">
+  
+        function deletecmd(e) {
+            if (!confirm('你确定要删除吗？')) {
+                return;
+            }
+            var cmdid = $(e).data('item');
+            $.ajax({
+                url: '/cmd/deletecmd',
+                type: 'post',
+                data: { cmdid: cmdid },
+                success: function (data) {
+                    if (data.code > 0) {
+                        alert("删除成功！");
+                        $(e).parents('tr').first().hide('slow');
+                    } else {
+                        alert(data.msg);
+                    }
+                }
+            });
+        }
+    </script>
+
+
+}
+

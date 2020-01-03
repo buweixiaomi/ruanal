@@ -1,0 +1,13 @@
+*.vs
+debug/
+release/
+bin/
+packages/
+*.user
+*.suo
+*.cache
+taskDllFile/
+obj/
+[dD]ebug/
+[rR]elease/
+_发布/

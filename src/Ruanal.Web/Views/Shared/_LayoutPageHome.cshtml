@@ -1,0 +1,44 @@
+﻿@using Ruanal.Web
+<!DOCTYPE html>
+@{
+    string urlkey = this.UrlKey();
+    //if (Request.QueryString["nocontainer"] != "true")
+    //{
+    //    Response.Redirect("/#/" + urlkey.Replace(".", "/"), true);
+    //}
+}
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <link href="~/Scripts/DatePicker/skin/WdatePicker.css" rel="stylesheet" />
+    @if (this.VTheme() == "gray")
+    {
+    <link href="~/Content/bootstrap.slate.css" rel="stylesheet" />
+    <link href="~/Content/Site.css?v=20170912" rel="stylesheet" />
+    <link href="~/Content/main.gray.css?v=20170912" rel="stylesheet" />
+    }
+    else
+    {
+    <link href="~/Content/bootstrap.css" rel="stylesheet" />
+    <link href="~/Content/Site.css?v=20170912" rel="stylesheet" />
+    <link href="~/Content/main.default.css?v=?v=20170912" rel="stylesheet" />
+    }
+    <script src="~/Scripts/jquery-1.9.1.js"></script>
+    <script src="~/Scripts/jquery-ui-1.12.1/jquery-ui.min.js"></script>
+    <script src="~/Scripts/bootstrap.js"></script>
+    <script src="~/Scripts/DatePicker/WdatePicker.js"></script>
+    <script src="~/Scripts/tabsub.js?v=20181225"></script>
+    <script src="~/Scripts/main.js?v=20170912"></script>
+    @RenderSection("Head", false)
+    @RenderSection("scripts", false)
+</head>
+<body>
+    @{Html.RenderPartial("_Refreshable");}
+    <div class="btn-warp">
+        @RenderSection("Button", false)
+    </div>
+    @RenderBody()
+</body>
+</html>

@@ -1,0 +1,107 @@
+﻿@using Webdiyer.WebControls.Mvc
+@using Ruanal.Web
+@model Ruanal.WebDomain.PageModel<Ruanal.WebDomain.Model.Dispatch>
+@{
+}
+
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th width="80px;">ID</th>
+            <th width="40px;">任务ID</th>
+            <th width="300px;">调度信息</th>
+            <th width="200px;">创建时间</th>
+            <th width="80px;">任务状态</th>
+            <th width="180px;">运行参数</th>
+            <th width="200px;">调度时间</th>
+            <th width="80px;">结果说明</th>
+            <th width="80px;">操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var a in Model.List)
+        {
+            if (a.DispatchState == 5 && a.EndTime == null)
+            {
+                a.EndTime = a.ExecuteTime;
+            }
+            <tr>
+                <td>
+                    @Html.ActionLink(a.DispatchId + "(" + a.NodeId + ")", "runlog", new { controller = "tasklog", runguid = a.InvokeId }, new { @class = "disitem", data_dispatchid = a.DispatchId, onclick = "return libjs.tabopen(this)" })
+                </td>
+                <td>@a.TaskId</td>
+                <td>
+                    <span>别名: </span><span>@a.NickName</span><br />
+                    <span>分组ID: </span><span>@a.GroupId</span><br />
+                    <span>调度ID: </span><span>@a.InvokeId</span><br />
+                    <span> RunKey: </span><span>@a.RunKey</span>
+                </td>
+                <td>
+                    <span>创建:@Html.ToDateString(a.CreateTime, "datetimefull")</span><br />
+                    <span>过期:@Html.ToDateString(a.ExpireTime, "datetimefull")</span>
+                </td>
+                <td>
+                    @switch (a.DispatchState)
+                    {
+                        case 0:
+                            <span class="label label-default">待分配</span>
+                            break;
+                        case 1:
+                            <span class="label label-info">待运行</span>
+                            break;
+                        case 2:
+                            <span class="label label-primary">运行中</span>
+                            break;
+                        case 3:
+                            <span class="label label-success">完成</span>
+                            break;
+                        case 4:
+                            <span class="label label-danger">出错</span>
+                            break;
+                        case 5:
+                            <span class="label label-danger">跳过</span>
+                            break;
+                        case 6:
+                            <span class="label label-danger">过期/作废</span>
+                            break;
+                        default:
+                            <span class="label label-info">未知</span>
+                            break;
+                    }
+                </td>
+
+                <td>@a.RunArgs</td>
+                <td>
+                    <span>分配:@Html.ToDateString(a.DispatchTime, "datetimefull")</span><br />
+                    <span>执行:@Html.ToDateString(a.ExecuteTime, "datetimefull")</span><br />
+                    <span>结束:@Html.ToDateString(a.EndTime, "datetimefull")</span><br />
+                    <span style="color:red;">
+                        @if (a.EndTime != null)
+                        {
+                            <span>用时:@((a.EndTime.Value - a.ExecuteTime.Value).TotalMinutes.ToString("0.00"))分钟</span>
+                        }
+                        else if (a.ExecuteTime != null)
+                        {
+                            <span>已用:@((DateTime.Now - a.ExecuteTime.Value).TotalMinutes.ToString("0.00"))分钟</span>
+                        }
+                        else
+                        {
+                            <span>等待:@((DateTime.Now - a.CreateTime).TotalMinutes.ToString("0.00"))分钟</span>
+                        }
+                    </span>
+                </td>
+                <td>@a.ResultText</td>
+                <td>
+                    <button class="btn btn-danger btn-sm" type="button" onclick="deletedispatch(this)" data-item="@a.DispatchId">！删除</button><br />
+                    <button class="btn btn-danger btn-sm" type="button" onclick="stopdispatch(this)" data-item="@a.DispatchId">停止</button><br />
+                    <button class="btn btn-primary btn-sm" type="button" onclick="showruningdispatch(this)" data-item="@a.DispatchId">查看运行</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+@Html.Pager(new Webdiyer.WebControls.Mvc.PagedList<object>(Model.List, Model.PageNo, Model.PageSize, Model.TotalCount), new PagerOptions { PageIndexParameterName = "pno", NumericPagerItemCount = 5, ContainerTagName = "ul", CssClass = "pagination pagination-sm", CurrentPagerItemTemplate = "<li class=\"active\"><a href=\"#\">{0}</a></li>", DisabledPagerItemTemplate = "<li class=\"disabled\"><a>{0}</a></li>", PagerItemTemplate = "<li>{0}</li>", Id = "bootstrappager2", PageIndexBoxId = "pageIndexBox", GoToButtonId = "goToBtn" })
+
+
+
+

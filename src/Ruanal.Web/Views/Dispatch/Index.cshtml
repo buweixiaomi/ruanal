@@ -1,0 +1,167 @@
+﻿@model Ruanal.WebDomain.PageModel<Ruanal.WebDomain.Model.Dispatch>
+@{
+    ViewBag.Title = "任务调度表";
+    Layout = "~/Views/Shared/_LayoutPageHome.cshtml";
+
+    string dispatchState = ((int?)ViewBag.dispatchState).ToString();
+    List<SelectListItem> items = new List<SelectListItem>() {
+new SelectListItem(){ Text = "所有", Value = "", Selected = dispatchState == ""},
+new SelectListItem(){ Text = "待分配", Value = "0", Selected = dispatchState == "0"},
+new SelectListItem(){ Text = "待运行", Value = "1", Selected = dispatchState == "1"},
+new SelectListItem(){ Text = "运行中", Value = "2", Selected = dispatchState == "2"},
+new SelectListItem(){ Text = "完成", Value = "3", Selected = dispatchState == "3"},
+new SelectListItem(){ Text = "出错", Value = "4", Selected = dispatchState == "4"},
+new SelectListItem(){ Text = "跳过", Value = "5", Selected = dispatchState == "5"},
+new SelectListItem(){ Text = "作废", Value = "6", Selected = dispatchState == "6"}
+};
+}
+
+<h2>@ViewBag.Title</h2>
+<div class="cc-content-header">
+    <form class="form-inline" role="form">
+        <div class="form-group">
+            <label for="keywords">关建字</label>
+            <input type="text" class="form-control" id="keywords" value="@ViewBag.keywords" name="keywords" placeholder="" />
+        </div>
+        <div class="form-group">
+            <label for="nodeid">任务ID</label>
+            <input type="text" class="form-control" id="taskid" style="width:60px" value="@ViewBag.taskid" name="taskid" placeholder="" />
+            <button type="button" class="btn btn-default" onclick=" libjs.selecttask('#taskid')">...</button>
+        </div>
+        <div class="form-group">
+            <label for="nodeid">节点ID</label>
+            <input type="text" class="form-control" id="nodeid" style="width:60px" value="@ViewBag.nodeid" name="nodeid" placeholder="" />
+            <button type="button" class="btn btn-default" onclick="libjs.selectnode('#nodeid')">...</button>
+        </div>
+        <div class="form-group">
+            <label for="begintime">命令时间</label>
+            <input type="text" class="form-control" id="begintime" value="@ViewBag.begintime" name="begintime" onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd HH:mm:ss' })" />
+            <input type="text" class="form-control" id="endtime" value="@ViewBag.endtime" name="endtime" onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd HH:mm:ss' })" />
+        </div>
+        <div class="form-group">
+            <label for="taskid">分配状态</label>
+            @Html.DropDownList("dispatchState", items, new { @class = "form-control cc-block cc-width-1" })
+        </div>
+        <button type="submit" class="btn btn-default">查询</button>
+        <div style="display:inline-block;float:right;">
+            <div class="btn-group btn-group-sm">
+                <button type="button" class="btn btn-warning" onclick="autostoppagedis()">检查自动停止</button>
+                <button type="button" class="btn btn-warning" onclick="stoppagedis()">停止当前页</button>
+                <button type="button" class="btn btn-warning" onclick="deletepagedis()">删除当前页</button>
+            </div>
+        </div>
+    </form>
+</div>
+@{ Html.RenderPartial("_List", Model);}
+
+@section Head
+{
+    <script type="text/javascript">
+
+        function deletedispatch(e) {
+            if (!confirm('你确定要删除吗？')) {
+                return;
+            }
+            var dispatchid = $(e).data('item');
+            $.ajax({
+                url: '/dispatch/deletedispatch',
+                type: 'post',
+                data: { dispatchid: dispatchid },
+                success: function (data) {
+                    if (data.code > 0) {
+                        alert("删除成功！");
+                        $(e).parents('tr').first().hide('slow');
+                    } else {
+                        alert(data.msg);
+                    }
+                }
+            });
+        }
+
+        function stopdispatch(e) {
+            if (!confirm('你确定要停止执行吗？')) {
+                return;
+            }
+            var dispatchid = $(e).data('item');
+            $.ajax({
+                url: '/dispatch/stopdispatch',
+                type: 'post',
+                data: { dispatchid: dispatchid },
+                success: function (data) {
+                    if (data.code > 0) {
+                        alert(data.msg);
+                    } else {
+                        alert(data.msg);
+                    }
+                }
+            });
+        }
+
+        function stoppagedis() {
+            if (!confirm('你确定要停止执行吗？')) {
+                return;
+            }
+            $("td a.disitem").each(function () {
+                $.ajax({
+                    url: '/dispatch/stopdispatch',
+                    type: 'post',
+                    data: {
+                        dispatchid: $(this).data("dispatchid")
+                    }
+                });
+            });
+            alert('操作成功！请注意结果！');
+        }
+        function deletepagedis() {
+            if (!confirm('你确定要删除吗？')) {
+                return;
+            }
+            $("td a.disitem").each(function () {
+                $.ajax({
+                    url: '/dispatch/deletedispatch',
+                    type: 'post',
+                    data: {
+                        dispatchid: $(this).data("dispatchid")
+                    }
+                });
+            });
+            alert('操作成功！请注意结果！');
+        }
+
+        function autostoppagedis() {
+            if (!confirm('你确定要检查停止吗？')) {
+                return;
+            }
+            $.ajax({
+                url: '/dispatch/autoendend',
+                type: 'post',
+                data: {
+                    dispatchid: $(this).data("dispatchid")
+                },
+                success: function (data) {
+                    alert(data.msg);
+                }
+            });
+        }
+
+
+        function showruningdispatch(e) {
+            var dispatchid = $(e).data('item');
+            $.ajax({
+                url: '/dispatch/showruningdispatch',
+                type: 'post',
+                data: { dispatchid: dispatchid },
+                success: function (data) {
+                    if (data.code > 0) {
+                        alert(data.data);
+                    } else {
+                        alert(data.msg);
+                    }
+                }
+            });
+        }
+    </script>
+
+
+}
+

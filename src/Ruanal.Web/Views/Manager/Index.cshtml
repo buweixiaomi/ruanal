@@ -1,0 +1,13 @@
+﻿@model Ruanal.WebDomain.PageModel<Ruanal.WebDomain.Model.Manager>
+@{
+    ViewBag.Title = "员工管理";
+    Layout = "~/Views/Shared/_LayoutPageHome.cshtml";
+}
+@section Head{
+    <script type="text/javascript">
+    </script>
+}
+<h2>员工管理 <a href="/manager/edit" class="btn btn-primary">新增员工</a></h2>
+
+@Html.Partial("Index_Sub", Model)
+

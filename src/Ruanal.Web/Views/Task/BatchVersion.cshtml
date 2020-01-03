@@ -1,0 +1,67 @@
+﻿@using Ruanal.Web
+@{
+    Layout = "~/Views/Shared/_LayoutPageHome.cshtml";
+
+    Dictionary<int, string> tags = ViewBag.tags as Dictionary<int, string>;
+    ViewBag.Title = "批量更新版本 ";
+}
+@section Head{
+    <script type="text/javascript">
+    </script>
+}
+
+
+<div style="width:1000px; padding:20px;">
+    <div>
+        <div class="well" style="width:800px;padding:8px;">
+            <h3 style="margin:10px;">批量更新版本</h3>
+            <p class="text-info">* 上传并添加当版本文件到所选择标签任务中，并设当前上传版本为任务当前版本！</p>
+            <form class="form-horizontal" role="form" method="post" enctype="multipart/form-data">
+
+                <div class="form-group">
+                    <label for="downloadfile" class="col-sm-2 control-label"><span style="color:red;">*</span>任务标签</label>
+                    <div class="col-sm-10">
+                        <select class="form-control cc-width-4" name="tag">
+                            <option value="">-请选择-</option>
+                            @foreach (KeyValuePair<int, string> a in tags)
+                            {
+                                if (!string.IsNullOrEmpty(a.Value))
+                                {
+                                    <option value="@a.Key">@a.Value</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="downloadfile" class="col-sm-2 control-label"><span style="color:red;">*</span>zip压缩文件</label>
+                    <div class="col-sm-10">
+                        <input type="file" id="downloadfile" name="downloadfile" placeholder="" value="">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="VersionNo" class="col-sm-2 control-label">版本号</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control cc-width-4" id="VersionNo" name="VersionNo" placeholder="版本号，可空自动生成" value="">
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <label for="Remark" class="col-sm-2 control-label">备注</label>
+                    <div class="col-sm-10">
+                        <textarea class="form-control cc-width-4" id="Remark" name="Remark" placeholder="" rows="2"></textarea>
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <button type="submit" class="btn btn-primary">保存</button>
+                        <span class="label label-info">@ViewBag.msg</span>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

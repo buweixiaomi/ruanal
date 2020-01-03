@@ -1,0 +1,227 @@
+﻿@using Webdiyer.WebControls.Mvc
+@using Ruanal.Web
+@model List<Ruanal.WebDomain.Model.Task>
+@{
+
+    Dictionary<int, string> tags = ViewBag.tags;
+    if (tags == null)
+    {
+        tags = new Dictionary<int, string>();
+    }
+}
+
+@if (Model.Count == 0)
+{
+    <div class="well">
+        暂无数据
+    </div>
+}
+
+@foreach (var a in Model)
+{
+    <div class="well well-sm">
+        <p>
+            <input type="hidden" class="list-task-item" value="@a.TaskId" />
+            <span style="font-size:18px; padding-right:20px; font-weight:bolder;">@a.TaskId) @a.Title</span>
+            <span style="font-weight:bolder;">【@(a.TaskType == 0 ? "普通任务" : "调度任务")】</span>
+            当前版本：<span style="font-weight:bolder;padding-right:20px;">@a.CurrVersionId</span>
+            运行策略：<span style="font-weight:bolder;padding-right:20px;">@a.RunCron</span>
+            入口地址：<span style="">【@a.EnterDll●@a.EnterClass】</span>
+            @if (a.TaskType == 1)
+            {
+                <span style="font-weight:bold;">调度器：【@a.DispatchClass】</span>
+            }
+        </p>
+        <p>
+            <div class="btn-group btn-group-sm taskbtns">
+                <button class="btn btn-primary" type="button" onclick="bcmd(this)" data-cmdtype="starttask" data-taskid="@(a.TaskId)">开始</button>
+                <button class="btn btn-danger" type="button" onclick="bcmd(this)" data-cmdtype="stoptask" data-taskid="@(a.TaskId)">停止</button>
+                <button class="btn btn-danger" type="button" onclick="bcmd(this)" data-cmdtype="uninstalltask" data-taskid="@(a.TaskId)">卸载</button>
+            </div>
+            <span>&nbsp;&nbsp;&nbsp;</span>
+            <div class="btn-group btn-group-sm taskbtns">
+                <button class="btn btn-danger btn-sm" type="button" onclick="settaskdispath(@a.TaskId,0,'1', '停止分配')">停止分配</button>
+                <button class="btn btn-primary btn-sm" type="button" onclick="settaskdispath(@a.TaskId,0,'0', '启动分配')">启动分配</button>
+            </div>
+
+            <span>&nbsp;&nbsp;&nbsp;</span>
+            <div class="btn-group btn-group-sm">
+                <button class="btn btn-default" onclick="libjs.tabopen(this)" href="/task/edit?taskid=@a.TaskId">详情/编辑</button>
+                <button class="btn btn-default" onclick="libjs.tabopen(this)" href="/tasklog/runlog?resulttype=0&taskid=@a.TaskId">运行情况</button>
+
+                <button class="btn btn-default" type="button" data-id="@a.TaskId" onclick="viewStatus(this)">实例情况</button>
+                <button class="btn btn-danger taskbtns" type="button" data-id="@a.TaskId" onclick="deletetask(this)">删除</button>
+            </div>
+        </p>
+
+        <div class="pull-right">
+            @foreach (var t in tags)
+            {
+                if (string.IsNullOrEmpty(t.Value))
+                {
+                    continue;
+                }
+                if ((a.TaskTags & (1 << (t.Key - 1))) != 0)
+                {
+                    <span class="label label-info">@t.Value</span>
+                }
+            }
+        </div>
+
+        @if (a.TaskBindings == null || a.TaskBindings.Count == 0)
+        {
+            <p style="color:red;">无节点绑定</p>
+        }
+        else
+        {
+            int runLocalCount = a.TaskBindings.Count(x => x.LocalState == 1);
+            int serverRunCount = a.TaskBindings.Count(x => x.ServerState == 1);
+            int sameStateCount = a.TaskBindings.Count(x => x.LocalState == x.ServerState);
+            int allCount = a.TaskBindings.Count;
+            <p>
+                <span class="cc-block cc-width-5-5">
+                    <span>本地状态：</span>
+                    @if (runLocalCount == 0)
+                    {
+
+                        <span class="label label-danger">停止</span>
+                    }
+                    else if (runLocalCount == allCount)
+                    {
+                        <span class="label label-success">运行中</span>
+                    }
+                    else
+                    {
+                        <span class="label label-warning">不一致！</span>
+                    }
+                    <span>服务状态：</span>
+                    @if (serverRunCount == 0)
+                    {
+                        <span class="label label-danger">停止</span>
+                    }
+                    else if (serverRunCount == allCount)
+                    {
+                        <span class="label label-success">运行中</span>
+                    }
+                    else
+                    {
+                        <span class="label label-warning">不一致！</span>
+                    }
+                    <span>分配状态：</span>
+                    @if (a.TaskBindings.Count(x => x.StopDispatch == 0) == 0)
+                    {
+                        <span class="label label-danger">停止</span>
+                    }
+                    else if (a.TaskBindings.Count(x => x.StopDispatch == 1) == 0)
+                    {
+                        <span class="label label-success">分配中</span>
+                    }
+                    else
+                    {
+                        <span class="label label-warning">不一致！</span>
+                    }
+                    @if (sameStateCount != allCount)
+                    {
+                        <span class="glyphicon glyphicon-alert" style="color:red;">有异常任务</span>
+                    }
+                    @if (a.TaskBindings.Count(b => !Ruanal.WebDomain.BLL.TaskBll.HeartIsOk(b.Node.LastHeartTime)) > 0)
+                    {
+                        <span style="color:red;"><span class="glyphicon glyphicon-alert"></span>心跳异常</span>
+                    }
+                    @if (a.TaskBindings.Count(b => b.RunVersion != a.CurrVersionId) > 0)
+                    {
+                        <span style="color:red;"><span class="glyphicon glyphicon-alert"></span>版本不一致</span>
+                    }
+                </span>
+            </p>
+            <div>
+                <p>
+                    <button type="button" class="btn btn-default btn-sm" data-tid="@a.TaskId" onclick="showorhidesubbindings(this)">
+                        <span class="glyphicon glyphicon-chevron-down"></span>展开节点详情
+                    </button>
+                </p>
+                <div class="subbindings-t-@a.TaskId" style="display:none;">
+                    @foreach (var b in a.TaskBindings)
+                    {
+
+                        <div class="well cc-block cc-width-4 binding-item">
+                            <div class="">
+                                <label>节点名称:</label>
+                                [@(b.NodeId)] @(b.Node.Title)
+                            </div>
+                            <div class="">
+                                <label>运行版本:</label>@b.RunVersion
+                            </div>
+                            <div class="">
+                                <label>节点上次心跳时间:</label>@Html.ToDateString(b.Node.LastHeartTime)
+                                @if (!Ruanal.WebDomain.BLL.TaskBll.HeartIsOk(b.Node.LastHeartTime))
+                                {
+                                    <span style="color:red;"><span class="glyphicon glyphicon-alert"></span>心跳异常</span>
+                                }
+                            </div>
+                            <div class="">
+                                <label>上次运行时间:</label>@Html.ToDateString(b.LastRunTime)
+                            </div>
+                            <div>
+                                <label>本地状态:</label>
+                                @if (b.LocalState == 0)
+                                {
+                                    <span class="label label-danger">停止</span>
+                                }
+                                else if (b.LocalState == 1)
+                                {
+                                    <span class="label label-success">运行中</span>
+                                }
+                                else
+                                {
+                                    <span class="label label-default">未知</span>
+                                }
+                                <label>运行状态:</label>
+                                @if (b.ServerState == 0)
+                                {
+                                    <span class="label label-danger">停止</span>
+                                }
+                                else if (b.ServerState == 1)
+                                {
+                                    <span class="label label-success">运行中</span>
+                                }
+                                else
+                                {
+                                    <span class="label label-default">未知</span>
+                                }
+                                @if (b.ServerState != b.LocalState)
+                                {
+                                    <span class="glyphicon glyphicon-alert" style="color:red;">状态异常</span>
+                                }
+                                <label>分配状态:</label>
+                                @if (b.StopDispatch == 0)
+                                {
+                                    <span class="label label-success">分配中</span>
+                                }
+                                else
+                                {
+                                    <span class="label label-danger">停止</span>
+                                }
+                            </div>
+                            <div class="btn-group">
+                                <button class="btn btn-primary btn-sm" type="button" onclick="bcmd(this)" data-cmdtype="starttask" data-taskid="@(a.TaskId)" data-nodeid="@b.NodeId">开始</button>
+                                <button class="btn btn-danger btn-sm" type="button" onclick="bcmd(this)" data-cmdtype="stoptask" data-taskid="@(a.TaskId)" data-nodeid="@b.NodeId">停止</button>
+                                <button class="btn btn-danger btn-sm" type="button" onclick="bcmd(this)" data-cmdtype="uninstalltask" data-taskid="@(a.TaskId)" data-nodeid="@b.NodeId">卸载</button>
+                            </div>
+                            <div class="btn-group btn-group-sm">
+                                @if (b.StopDispatch == 0)
+                                {
+                                    <button class="btn btn-danger btn-sm" type="button" onclick="settaskdispath(@b.TaskId,@b.NodeId,'1', '停止分配')">停止分配</button>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-primary btn-sm" type="button" onclick="settaskdispath(@b.TaskId,@b.NodeId,'0', '启动分配')">启动分配</button>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+}

@@ -1,0 +1,195 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{B315EC03-3EE7-4E8D-8069-1D3FC427881A}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Ruanal.WebDomain</RootNamespace>
+    <AssemblyName>Ruanal.WebDomain</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release_64|AnyCPU'">
+    <OutputPath>bin\Release_64\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release_64|x64'">
+    <OutputPath>bin\x64\Release_64\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\RefLibs\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\RefLibs\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="RabbitMQ.Client">
+      <HintPath>..\RefLibs\RabbitMQ.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.Common">
+      <HintPath>..\RefLibs\ServiceStack.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.Interfaces">
+      <HintPath>..\RefLibs\ServiceStack.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.Redis">
+      <HintPath>..\RefLibs\ServiceStack.Redis.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.Text">
+      <HintPath>..\RefLibs\ServiceStack.Text.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Zd.MsgBox.SDK">
+      <HintPath>..\RefLibs\Zd.MsgBox.SDK.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BLL\ApiBll.cs" />
+    <Compile Include="BLL\BusinessBll.cs" />
+    <Compile Include="BLL\CmdBll.cs" />
+    <Compile Include="BLL\CmdHelper.cs" />
+    <Compile Include="BLL\CommBll.cs" />
+    <Compile Include="BLL\ManageApiBll.cs" />
+    <Compile Include="BLL\SysToolBll.cs" />
+    <Compile Include="BLL\TaskBll.cs" />
+    <Compile Include="BLL\TaskDispatcher.cs" />
+    <Compile Include="BLL\TaskLogBll.cs" />
+    <Compile Include="BLL\TaskTagBll.cs" />
+    <Compile Include="DAL\BusinessDal.cs" />
+    <Compile Include="DAL\CmdDal.cs" />
+    <Compile Include="DAL\CommDal.cs" />
+    <Compile Include="DAL\DispatchDal.cs" />
+    <Compile Include="DAL\TaskDal.cs" />
+    <Compile Include="DAL\TaskLogDal.cs" />
+    <Compile Include="DAL\TaskTagDal.cs" />
+    <Compile Include="Entity\HigthChartEntity.cs" />
+    <Compile Include="Entity\LoginTokenModel.cs" />
+    <Compile Include="Entity\MenuGroup.cs" />
+    <Compile Include="Entity\MenuItem.cs" />
+    <Compile Include="Entity\Summary.cs" />
+    <Compile Include="EnumHelper.cs" />
+    <Compile Include="BLL\ManagerBll.cs" />
+    <Compile Include="BLL\NodeBll.cs" />
+    <Compile Include="BLL\OperationLogBll.cs" />
+    <Compile Include="DAL\ManagerDal.cs" />
+    <Compile Include="DAL\NodeDal.cs" />
+    <Compile Include="DAL\OperationLogDal.cs" />
+    <Compile Include="JsonEntity.cs" />
+    <Compile Include="MApiEntity\Node.cs" />
+    <Compile Include="MApiEntity\Task.cs" />
+    <Compile Include="MApiEntity\TaskBinding.cs" />
+    <Compile Include="MApiEntity\TaskRunLog.cs" />
+    <Compile Include="MApiEntity\TaskVersion.cs" />
+    <Compile Include="Model\Cmd.cs" />
+    <Compile Include="Model\Dispatch.cs" />
+    <Compile Include="Model\EnterpriseShop.cs" />
+    <Compile Include="Model\Manager.cs" />
+    <Compile Include="Entity\PageModel.cs" />
+    <Compile Include="Model\MiniEnterprise.cs" />
+    <Compile Include="Model\Node.cs" />
+    <Compile Include="Model\OperationLog.cs" />
+    <Compile Include="MException.cs" />
+    <Compile Include="Model\SourceDbModel.cs" />
+    <Compile Include="Model\Task.cs" />
+    <Compile Include="Model\TaskBinding.cs" />
+    <Compile Include="Model\TaskRunLog.cs" />
+    <Compile Include="Model\TaskVersion.cs" />
+    <Compile Include="Model\TaskWorkLog.cs" />
+    <Compile Include="PlugManager.cs" />
+    <Compile Include="Plugs\ConfigRefreshPlug.cs" />
+    <Compile Include="Plugs\ExpireDispatchPlug.cs" />
+    <Compile Include="Plugs\InitTablePlug.cs" />
+    <Compile Include="Plugs\JobMonitorPlug.cs" />
+    <Compile Include="Plugs\MantncePlug.cs" />
+    <Compile Include="Plugs\EndStopedDispatchPlug.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Pub.cs" />
+    <Compile Include="Utils.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\RLib\RLib.csproj">
+      <Project>{44044943-5a79-4f35-8588-d90770e09d60}</Project>
+      <Name>RLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Ruanal.Core\Ruanal.Core.csproj">
+      <Project>{a3cb446c-853c-4325-b406-9b3779964aee}</Project>
+      <Name>Ruanal.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Ruanal.JobBase\Ruanal.Job.csproj">
+      <Project>{53636a16-989d-4e35-b880-50db5f3cd987}</Project>
+      <Name>Ruanal.Job</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="createWorkLog.sql" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

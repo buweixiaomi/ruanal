@@ -1,0 +1,101 @@
+﻿@{
+    ViewBag.Title = "系统工具";
+    Layout = "~/Views/Shared/_LayoutPageHome.cshtml";
+    string runconfig = ViewBag.RunConfig;
+}
+
+@section scripts
+{
+    <script type="text/javascript">
+
+        function deletelog(ty, dt) {
+            if (!confirm('你确定要删除' + dt + '前的日志吗？'))
+                return;
+
+            $.ajax({
+                url: '/systool/ClearLog',
+                type: 'post',
+                data: { logtype: ty, endTime: dt },
+                success: function (data) {
+                    if (data.code > 0) {
+                        alert('删除成功' + data.msg);
+                    } else {
+                        alert(data.msg);
+                    }
+                }
+            });
+        }
+        function deletepackages(keeppackagecount) {
+            if (!confirm('你确定要删除吗？'))
+                return;
+
+            $.ajax({
+                url: '/systool/DeleteTaskPackage',
+                type: 'post',
+                data: { keeppackagecount: keeppackagecount },
+                success: function (data) {
+                    if (data.code > 0) {
+                        alert('删除成功' + data.msg);
+                    } else {
+                        alert(data.msg);
+                    }
+                }
+            });
+        }
+        function saveconfig() {
+            $.ajax({
+                url: '/systool/saveconfig',
+                type: 'post',
+                data: { config: $("#config").val() },
+                success: function (data) {
+                    if (data.code > 0) {
+                        alert('保存成功');
+                        location.reload();
+                    } else {
+                        alert(data.msg);
+                    }
+                }
+            });
+        }
+    </script>
+}
+
+
+
+
+<div class="well">
+    <h3>删除时间点前的日志</h3>
+    <p>
+        <label>删除工作日志</label>
+        <input type="text" class="form-control cc-block cc-width-2" id="worklogtime" value="@(DateTime.Now.AddDays(-7).ToString("yyyy-MM-dd"))"
+               onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd' })" />
+        <button class="btn btn-danger" type="button" onclick="deletelog('worklog',$('#worklogtime').val())">删除</button>
+    </p>
+
+    <p>
+        <label>删除运行记录</label>
+        <input type="text" class="form-control  cc-block cc-width-2" id="runlogtime" value="@(DateTime.Now.AddDays(-7).ToString("yyyy-MM-dd"))"
+               onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd' })" />
+        <button class="btn btn-danger" type="button" onclick="deletelog('runlog', $('#runlogtime').val())">删除</button>
+    </p>
+
+    <p>
+        <label>删除分配记录</label>
+        <input type="text" class="form-control  cc-block cc-width-2" id="dispatchtime" value="@(DateTime.Now.AddDays(-7).ToString("yyyy-MM-dd"))"
+               onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd' })" />
+        <button class="btn btn-danger" type="button" onclick="deletelog('dispatchlog', $('#dispatchtime').val())">删除</button>
+    </p>
+
+    <p>
+        <label>仅保留历包数</label>
+        <input type="text" class="form-control  cc-block cc-width-2" id="keeppackagecount" value="10" />
+        <button class="btn btn-danger" type="button" onclick="deletepackages($('#keeppackagecount').val())">删除</button>
+    </p>
+</div>
+<div class="well">
+    <h3>配置</h3>
+    <div>
+        <textarea id="config" name="config" class="form-control" rows="10">@Html.Raw(runconfig??"")</textarea>
+    </div>
+    <p><button class="btn btn-primary" type="button" onclick="saveconfig()">保存</button></p>
+</div>

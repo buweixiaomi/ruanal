@@ -1,0 +1,50 @@
+﻿
+
+每个客户端的请求频率
+2da61d4eccb5a8bf52ab138eb05d0ffc:0.1/s
+e5006b0c779855fc608bf6f7d9c96b54:0.1/s
+每个接口的请求频率
+/api/apisys/getnodeconfig:0.0/s
+/api/apitask/nodetasks:0.0/s
+/api/apisys/pingmasternode:0.1/s
+/api/apisys/pingworknode:0.1/s
+
+【2019-05-21 10:42:30】分析
+每个客户端的请求频率
+2da61d4eccb5a8bf52ab138eb05d0ffc: 0.97/s
+e5006b0c779855fc608bf6f7d9c96b54: 0.25/s
+每个接口的请求频率
+/api/apisys/getnodeconfig: 0.04/s  平均用时: 0.057s
+/api/apitask/nodetasks: 0.04/s  平均用时: 0.040s
+/api/apisys/pingmasternode: 0.09/s  平均用时: 0.044s
+/api/apisys/pingworknode: 0.11/s  平均用时: 0.058s
+/api/apicmd/getnews: 0.07/s  平均用时: 0.040s
+/api/apicmd/beginexecute: 0.04/s  平均用时: 0.035s
+/api/apitask/taskdetail: 0.04/s  平均用时: 0.036s
+/api/apicmd/endexecute: 0.04/s  平均用时: 0.067s
+/api/apisys/getdispatchwork: 0.09/s  平均用时: 0.129s
+/api/apisys/taskbeginrunlog: 0.19/s  平均用时: 0.124s
+/api/apitask/builddispatchs: 0.02/s  平均用时: 0.097s
+/api/apisys/begindispatchexecute: 0.18/s  平均用时: 0.174s
+/api/apisys/addworklogbatch: 0.02/s  平均用时: 0.429s
+/api/apisys/taskendrunlog: 0.14/s  平均用时: 0.080s
+/api/apisys/enddispatchexecute: 0.14/s  平均用时: 0.113s
+
+
+【2019-05-21 10:43:30】分析
+每个客户端的请求频率
+e5006b0c779855fc608bf6f7d9c96b54: 0.29/s
+2da61d4eccb5a8bf52ab138eb05d0ffc: 2.59/s
+每个接口的请求频率
+/api/apisys/pingmasternode: 0.07/s  平均用时: 0.050s
+/api/apisys/taskendrunlog: 0.59/s  平均用时: 0.101s
+/api/apisys/enddispatchexecute: 0.54/s  平均用时: 0.136s
+/api/apisys/getdispatchwork: 0.31/s  平均用时: 0.146s
+/api/apisys/addworklogbatch: 0.05/s  平均用时: 0.012s
+/api/apitask/checkdispatchgroup: 0.05/s  平均用时: 0.028s
+/api/apisys/taskbeginrunlog: 0.59/s  平均用时: 0.180s
+/api/apitask/builddispatchs: 0.05/s  平均用时: 0.055s
+/api/apisys/begindispatchexecute: 0.54/s  平均用时: 0.242s
+/api/apisys/pingworknode: 0.07/s  平均用时: 0.034s
+
+
